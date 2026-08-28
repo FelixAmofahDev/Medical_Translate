@@ -26,7 +26,9 @@ export function ConsultationPage() {
   const recordingCompletedRef = useRef(false)
 
   useEffect(() => {
+    console.log('[Consultation] status changed:', status, 'recordingCompletedRef:', recordingCompletedRef.current)
     if (status === 'done' && !recordingCompletedRef.current) {
+      console.log('[Consultation] Triggering processRecording')
       recordingCompletedRef.current = true
       processRecording()
     }
@@ -129,13 +131,13 @@ export function ConsultationPage() {
                 {turn.status === 'processing' && (
                   <div className="flex items-center gap-3 py-6">
                     <Spinner />
-                    <p className="text-sm text-gray-600">Translating...</p>
+                    <p className="text-sm text-gray-600">Transcribing...</p>
                   </div>
                 )}
 
                 {turn.status === 'error' && (
                   <div className="rounded-lg bg-red-50 p-4">
-                    <p className="text-sm text-red-700">{turn.error || 'Translation failed'}</p>
+                    <p className="text-sm text-red-700">{turn.error || 'Transcription failed'}</p>
                     <Button variant="secondary" size="sm" className="mt-2" onClick={retryLast}>
                       Retry
                     </Button>
@@ -143,23 +145,16 @@ export function ConsultationPage() {
                 )}
 
                 {turn.status === 'done' && (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-gray-50 p-4">
-                      <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                        Twi
-                      </h4>
-                      <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-                        {turn.twiText}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-teal-50 border border-teal-100 p-4">
-                      <h4 className="text-xs font-medium text-teal-700 uppercase tracking-wider mb-2">
-                        English
-                      </h4>
-                      <p className="text-teal-900 leading-relaxed whitespace-pre-wrap font-medium">
-                        {turn.englishText}
-                      </p>
-                    </div>
+                  <div className="rounded-lg bg-gray-50 p-4">
+                    <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                      Twi Transcription
+                    </h4>
+                    <p className="text-gray-900 leading-relaxed whitespace-pre-wrap font-medium">
+                      {turn.twiText}
+                    </p>
+                    <p className="mt-3 text-xs text-gray-400">
+                      English translation will appear here once the translation service is enabled.
+                    </p>
                   </div>
                 )}
               </Card>

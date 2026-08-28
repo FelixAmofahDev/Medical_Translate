@@ -1,19 +1,36 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/useAuth'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 
+type AuthMode = 'login' | 'signup'
+
 export function LoginPage() {
-  const { signIn, signInWithGoogle, error, loading } = useAuth()
+  const { signIn, signUp, signInWithGoogle, error, loading, user } = useAuth()
+  const navigate = useNavigate()
+  const [mode, setMode] = useState<AuthMode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (user) {
+      navigate('/', { replace: true })
+    }
+  }, [user, navigate])
+
+  const isSignup = mode === 'signup'
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      await signIn(email, password)
+      if (isSignup) {
+        await signUp(email, password)
+      } else {
+        await signIn(email, password)
+      }
     } catch {
       // error handled in hook
     } finally {
@@ -27,6 +44,10 @@ export function LoginPage() {
     } catch {
       // error handled in hook
     }
+  }
+
+  const toggleMode = () => {
+    setMode((prev) => (prev === 'login' ? 'signup' : 'login'))
   }
 
   return (
@@ -81,7 +102,7 @@ export function LoginPage() {
             </div>
 
             <Button type="submit" className="w-full" loading={isSubmitting || loading}>
-              Sign in
+              {isSignup ? 'Create account' : 'Sign in'}
             </Button>
           </form>
 
@@ -107,7 +128,18 @@ export function LoginPage() {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-xs text-gray-500">
+          <p className="mt-6 text-center text-sm text-gray-600">
+            {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="text-teal-700 hover:text-teal-800 font-medium"
+            >
+              {isSignup ? 'Sign in' : 'Sign up'}
+            </button>
+          </p>
+
+          <p className="mt-4 text-center text-xs text-gray-500">
             For clinical use only. Verify important information when necessary.
           </p>
         </Card>

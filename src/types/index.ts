@@ -13,4 +13,5 @@ export interface RecordingState {
   status: RecordingStatus
   durationSeconds: number
   error?: string
+  blob?: Blob
 }

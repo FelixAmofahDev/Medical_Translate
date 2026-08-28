@@ -10,38 +10,62 @@ const getBaseUrl = () => {
 
 export async function transcribeAudio(audioBlob: Blob): Promise<TranslationResponse> {
   const baseUrl = getBaseUrl()
+  const url = `${baseUrl}/transcribe`
+  console.log('[API] POST', url, 'blob bytes:', audioBlob.size, 'type:', audioBlob.type)
+
   const formData = new FormData()
   formData.append('audio', audioBlob, 'recording.webm')
 
-  const response = await fetch(`${baseUrl}/transcribe`, {
-    method: 'POST',
-    body: formData,
-  })
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    })
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(errorText || `Transcription failed with status ${response.status}`)
+    console.log('[API] Response status:', response.status, response.statusText)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('[API] Error body:', errorText)
+      throw new Error(errorText || `Transcription failed with status ${response.status}`)
+    }
+
+    const data = (await response.json()) as TranslationResponse
+    console.log('[API] Response data:', data)
+    return data
+  } catch (error) {
+    console.error('[API] Request failed:', error)
+    throw error
   }
-
-  const data = (await response.json()) as TranslationResponse
-  return data
 }
 
 export async function translateAudio(audioBlob: Blob): Promise<TranslationApiResponse> {
   const baseUrl = getBaseUrl()
+  const url = `${baseUrl}/translate`
+  console.log('[API] POST', url, 'blob bytes:', audioBlob.size, 'type:', audioBlob.type)
+
   const formData = new FormData()
   formData.append('audio', audioBlob, 'recording.webm')
 
-  const response = await fetch(`${baseUrl}/translate`, {
-    method: 'POST',
-    body: formData,
-  })
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    })
 
-  if (!response.ok) {
-    const errorText = await response.text()
-    throw new Error(errorText || `Translation failed with status ${response.status}`)
+    console.log('[API] Response status:', response.status, response.statusText)
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('[API] Error body:', errorText)
+      throw new Error(errorText || `Translation failed with status ${response.status}`)
+    }
+
+    const data = (await response.json()) as TranslationApiResponse
+    console.log('[API] Response data:', data)
+    return data
+  } catch (error) {
+    console.error('[API] Request failed:', error)
+    throw error
   }
-
-  const data = (await response.json()) as TranslationApiResponse
-  return data
 }

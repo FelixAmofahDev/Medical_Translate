@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
@@ -48,6 +49,18 @@ export function useAuth() {
     }
   }, [])
 
+  const signUp = useCallback(async (email: string, password: string) => {
+    setState((prev) => ({ ...prev, error: null }))
+    const auth = getFirebaseAuth()
+    try {
+      await createUserWithEmailAndPassword(auth, email, password)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Sign up failed'
+      setState((prev) => ({ ...prev, error: message }))
+      throw error
+    }
+  }, [])
+
   const signInWithGoogle = useCallback(async () => {
     setState((prev) => ({ ...prev, error: null }))
     const auth = getFirebaseAuth()
@@ -72,5 +85,5 @@ export function useAuth() {
     }
   }, [])
 
-  return { ...state, signIn, signInWithGoogle, signOut }
+  return { ...state, signIn, signUp, signInWithGoogle, signOut }
 }

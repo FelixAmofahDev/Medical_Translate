@@ -31,29 +31,37 @@ export function useMediaRecorder(): MediaRecorderResult {
   }, [clearTimer])
 
   const startRecording = useCallback(async () => {
+    console.log('[Recorder] startRecording called')
     try {
+      console.log('[Recorder] Requesting microphone...')
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      console.log('[Recorder] Microphone granted')
       streamRef.current = stream
       chunksRef.current = []
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : undefined,
       })
+      console.log('[Recorder] MediaRecorder created, mimeType:', mediaRecorder.mimeType)
 
       mediaRecorder.ondataavailable = (event) => {
+        console.log('[Recorder] ondataavailable size:', event.data.size)
         if (event.data.size > 0) {
           chunksRef.current.push(event.data)
         }
       }
 
       mediaRecorder.onstop = () => {
+        console.log('[Recorder] onstop fired, chunks:', chunksRef.current.length)
         const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' })
+        console.log('[Recorder] Blob created size:', blob.size, 'type:', blob.type)
         stream.getTracks().forEach((track) => track.stop())
         streamRef.current = null
         setState((prev) => ({ ...prev, status: 'done', blob }))
       }
 
-      mediaRecorder.onerror = () => {
+      mediaRecorder.onerror = (event) => {
+        console.error('[Recorder] MediaRecorder error:', event)
         clearTimer()
         stream.getTracks().forEach((track) => track.stop())
         streamRef.current = null
@@ -66,6 +74,7 @@ export function useMediaRecorder(): MediaRecorderResult {
 
       mediaRecorderRef.current = mediaRecorder
       mediaRecorder.start(1000)
+      console.log('[Recorder] Recording started')
       startTimeRef.current = Date.now()
 
       setState({ status: 'recording', durationSeconds: 0 })
@@ -75,6 +84,7 @@ export function useMediaRecorder(): MediaRecorderResult {
         setState((prev) => ({ ...prev, durationSeconds: elapsed }))
       }, 1000)
     } catch (error) {
+      console.error('[Recorder] startRecording failed:', error)
       const message = error instanceof Error ? error.message : 'Microphone access denied'
       setState((prev) => ({
         ...prev,
@@ -85,13 +95,18 @@ export function useMediaRecorder(): MediaRecorderResult {
   }, [clearTimer])
 
   const stopRecording = useCallback(() => {
+    console.log('[Recorder] stopRecording called, state:', mediaRecorderRef.current?.state)
     clearTimer()
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop()
+      console.log('[Recorder] stop() called')
+    } else {
+      console.log('[Recorder] stop skipped, already inactive')
     }
   }, [clearTimer])
 
   const reset = useCallback(() => {
+    console.log('[Recorder] reset called')
     clearTimer()
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop())
@@ -104,6 +119,7 @@ export function useMediaRecorder(): MediaRecorderResult {
 
   return {
     ...state,
+    blob: state.blob,
     startRecording,
     stopRecording,
     reset,

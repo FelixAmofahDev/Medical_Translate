@@ -12,6 +12,7 @@ const queryClient = new QueryClient({
 })
 
 export default function App() {
+  console.log('[App] MediTranslate app loaded')
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
