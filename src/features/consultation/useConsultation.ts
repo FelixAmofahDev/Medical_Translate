@@ -49,7 +49,8 @@ export function useAudioRecorder() {
           turn.id === turnId
             ? {
                 ...turn,
-                twiText: data.text,
+                twiText: data.twi_text,
+                englishText: data.english_text,
                 status: 'done' as const,
               }
             : turn
@@ -88,7 +89,8 @@ export function useAudioRecorder() {
           turn.id === lastFailed.id
             ? {
                 ...turn,
-                twiText: data.text,
+                twiText: data.twi_text,
+                englishText: data.english_text,
                 status: 'done' as const,
               }
             : turn

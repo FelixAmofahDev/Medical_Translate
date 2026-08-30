@@ -131,7 +131,7 @@ export function ConsultationPage() {
                 {turn.status === 'processing' && (
                   <div className="flex items-center gap-3 py-6">
                     <Spinner />
-                    <p className="text-sm text-gray-600">Transcribing...</p>
+                    <p className="text-sm text-gray-600">Transcribing & translating...</p>
                   </div>
                 )}
 
@@ -145,16 +145,23 @@ export function ConsultationPage() {
                 )}
 
                 {turn.status === 'done' && (
-                  <div className="rounded-lg bg-gray-50 p-4">
-                    <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Twi Transcription
-                    </h4>
-                    <p className="text-gray-900 leading-relaxed whitespace-pre-wrap font-medium">
-                      {turn.twiText}
-                    </p>
-                    <p className="mt-3 text-xs text-gray-400">
-                      English translation will appear here once the translation service is enabled.
-                    </p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-lg bg-gray-50 p-4">
+                      <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                        Twi
+                      </h4>
+                      <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                        {turn.twiText}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-teal-50 border border-teal-100 p-4">
+                      <h4 className="text-xs font-medium text-teal-700 uppercase tracking-wider mb-2">
+                        English
+                      </h4>
+                      <p className="text-teal-900 leading-relaxed whitespace-pre-wrap font-medium">
+                        {turn.englishText}
+                      </p>
+                    </div>
                   </div>
                 )}
               </Card>
